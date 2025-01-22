@@ -76,4 +76,26 @@ router.put('/product/:id', async (req, res) => {
     }
 })
 
+
+router.delete('/product/:id', async (req, res) => {
+
+    const id = parseInt(req.params.id);
+
+    try {
+        await prisma.product.delete({
+            where: {
+                id
+            }
+        })
+
+        res.send({
+            message : 'Deleted',
+        })
+
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ error: "error" }).send(error.message);
+    }
+})
+
 module.exports = router;
