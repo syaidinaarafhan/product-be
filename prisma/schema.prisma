@@ -20,7 +20,7 @@ model User {
 }
 
 model Product {
-  id          BigInt @id @default(autoincrement())
+  id          Int @id @default(autoincrement())
   name        String 
   price       Decimal
   stock       Int
@@ -28,18 +28,18 @@ model Product {
 }
 
 model Order {
-  id            BigInt @id @default(autoincrement())
+  id            Int @id @default(autoincrement())
   customer_name String 
   order_date    DateTime @default(now())
   items         OrderItems[]
 }
 
 model OrderItems {
-  id              BigInt @id @default(autoincrement())
+  id              Int @id @default(autoincrement())
   order           Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId         BigInt
+  orderId         Int
   product         Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId       BigInt
+  productId       Int
   quantity        Int
   price           Decimal
 }

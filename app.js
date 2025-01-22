@@ -12,8 +12,7 @@ dotenv.config()
 
 const PORT = process.env.PORT
 
-
-app.use('/api', productController);
+app.use(productController);
 
 app.listen(PORT, () => {
     console.log(`App listening to http://localhost:${PORT}`)

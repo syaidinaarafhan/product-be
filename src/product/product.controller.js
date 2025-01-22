@@ -4,6 +4,7 @@ const router = express.Router();
 
 router.post('/postProduct', async (req, res) => {
     const { name, price, stock } = req.body;
+
     try {
         const post = await prisma.product.create({
             data: {
@@ -12,8 +13,14 @@ router.post('/postProduct', async (req, res) => {
                 stock
             }
         })
-        res.status(201).json(post);
+        res.send({
+            data : post,
+            message : 'Success',
+          })
     } catch (error) {
-        res.status(400).json({ error: "Failed to create product" });
+        console.error(error);
+        res.status(400).json({ error: "Failed to create product" }).send(error.message);
     }
 })
+
+module.exports = router;
