@@ -98,4 +98,83 @@ router.delete('/product/:id', async (req, res) => {
     }
 })
 
+router.post('/postOrders', async (req, res) => {
+    const { customer_name, items } = req.body;
+
+    if (!customer_name || customer_name.trim() === '') {
+        return res.status(400).json({ error: 'Customer name is required' });
+    }
+    if (!Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ error: 'Items are required' });
+    }
+
+    for (const item of items) {
+        if (!item.product_id || item.product_id <= 0) {
+            return res.status(400).json({ error: `Invalid product ID: ${item.product_id}` });
+        }
+        if (!item.quantity || item.quantity <= 0) {
+            return res.status(400).json({ error: `Quantity must cannot be 0 for product ID: ${item.product_id}` });
+        }
+    }
+
+    try {
+
+        const productData = await Promise.all(
+            items.map((item) =>
+                prisma.product.findUnique({
+                    where: { id: item.product_id },
+                    select: { price: true, stock: true },
+                })
+            )
+        );
+
+        for (let i = 0; i < items.length; i++) {
+            const product = productData[i];
+
+            if (!product) {
+                return res.status(400).json({ error: `Product ID ${items[i].product_id} does not exist` });
+            }
+
+            if (product.stock < items[i].quantity) {
+                return res.status(400).json({ error: `Insufficient stock for product ID ${items[i].product_id}` });
+            }
+
+            items[i].price = product.price;
+        }
+
+        const order = await prisma.$transaction(async (prisma) => {
+            const newOrder = await prisma.order.create({
+                data: {
+                    customer_name,
+                    items: {
+                        create: items.map((item) => ({
+                            product: { connect: { id: item.product_id } },
+                            quantity: item.quantity,
+                            price: item.price,
+                        })),
+                    },
+                },
+            });
+
+            for (const item of items) {
+                await prisma.product.update({
+                    where: { id: item.product_id },
+                    data: { stock: { decrement: item.quantity } },
+                });
+            }
+
+            return newOrder;
+        });
+
+        res.status(201).json({
+            message: 'Success',
+            data: order,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'error', details: error.message });
+    }
+ 
+})
+
 module.exports = router;
