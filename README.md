@@ -45,3 +45,15 @@
 ### c. Tujuan dari Normalisasi Database
 
 **Normalisasi** adalah proses merancang database untuk mengurangi redundansi dan meningkatkan integritas data. Salah satu kelemahan dari normalisasi adalah dapat menyebabkan banyaknya tabel yang saling terhubung, yang mempersulit query dan menambah jumlah join yang diperlukan
+
+### Dokumentasi
+
+dependencies yang dibutuhkan adalah 
+
+npm install @prisma/client@^6.2.1 bcryptjs@^2.4.3 cors@^2.8.5 dotenv@^16.4.7 express@^4.21.2 express-jwt@^8.5.1 jsonwebtoken@^9.0.2
+
+dan untuk integerasi database hanya perlu melakukan
+
+npx prisma migrate dev --name init
+
+lalu untuk menjalankan aplikasi saya memakai nodemon
