@@ -48,18 +48,42 @@ router.post('/postProduct', async (req, res) => {
     }
 })
 
+router.get('/product/:id', async (req, res) => {
+    const id = parseInt(req.params.id);
+    
+    try {
+      const product = await prisma.product.findUnique({
+        where: { id }
+      });
+  
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+  
+      res.json({ data: product });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'error' });
+    }
+});
+
 router.put('/product/:id', async (req, res) => {
     const id = parseInt(req.params.id);
 
     const { name, price, stock } = req.body;
 
     try {
+
+        if (!name || !price || stock == null) {
+            return res.status(400).json({ error: 'Data yang dikirim tidak lengkap' });
+        }
+
         const update = await prisma.product.update({
             where: {
                 id
             },
             data: {
-                name,
+                name, 
                 price: parseFloat(price),
                 stock
             }
@@ -75,7 +99,6 @@ router.put('/product/:id', async (req, res) => {
         res.status(400).json({ error: "error" }).send(error.message);
     }
 })
-
 
 router.delete('/product/:id', async (req, res) => {
 
@@ -177,17 +200,28 @@ router.post('/postOrders', async (req, res) => {
  
 })
 
-router.get('/getOrder', async (req, res) => {
+router.get('/getOrders', async (req, res) => {
     try {
-        const Data = await prisma.orderItems.findMany()
+        const orders = await prisma.order.findMany({
+            include: {
+                items: {
+                    include: {
+                        product: true,
+                    },
+                },
+            },
+        });
+
         res.send({
-            data: Data,
-            message : 'Success',
-        })
+            data: orders,
+            message: 'Success',
+        });
     } catch (error) {
         console.error(error);
-        res.status(400).json({ error: "error" }).send(error.message);
+        res.status(500).json({ error: 'Error fetching orders' }).send(error.message);
     }
-})
+});
+
+
 
 module.exports = router;
