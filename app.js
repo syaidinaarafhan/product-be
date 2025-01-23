@@ -16,6 +16,7 @@ const PORT = process.env.PORT
 
 app.use(productRoutes);
 app.use(sqlRoutes);
+app.use(userRoutes);
 
 
 app.listen(PORT, () => {
