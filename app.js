@@ -1,7 +1,9 @@
 const dotenv = require("dotenv")
 const express = require("express")
 const cors = require("cors")
-const productController = require('./src/product/product.controller')
+const productRoutes = require('./src/routes/product.routes')
+
+const userController = require('./src/user/user.controller')
 
 const app = express()
 
@@ -12,7 +14,8 @@ dotenv.config()
 
 const PORT = process.env.PORT
 
-app.use(productController);
+app.use(productRoutes);
+
 
 app.listen(PORT, () => {
     console.log(`App listening to http://localhost:${PORT}`)
