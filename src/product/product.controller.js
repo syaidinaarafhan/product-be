@@ -177,4 +177,17 @@ router.post('/postOrders', async (req, res) => {
  
 })
 
+router.get('/getOrder', async (req, res) => {
+    try {
+        const Data = await prisma.orderItems.findMany()
+        res.send({
+            data: Data,
+            message : 'Success',
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ error: "error" }).send(error.message);
+    }
+})
+
 module.exports = router;
